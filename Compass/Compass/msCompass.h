@@ -98,6 +98,7 @@ struct SensorValue {
 	double X;
 	double Y;
 	double Z;
+
 	SensorValue operator + (const SensorValue & v) {
 		SensorValue out;
 		out.X = this->X + v.X;
@@ -131,8 +132,8 @@ struct SensorValue {
 class MsCompassClass
 {
 protected:
-	SensorValue scale;
-	SensorValue offset;
+	SensorValue scale = { 1.0,1.0,1.0 };
+	SensorValue offset = { 0.0,0.0,0.0 };
 
 	bool write(uint8_t _address, byte _value);
 	bool read(byte * _buff, uint8_t _address, uint8_t _length);

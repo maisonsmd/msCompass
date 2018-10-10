@@ -91,7 +91,7 @@ void loop() {
 }
 
 void SendDumpData() {
-    CompassRawValue rawVal;
+    SensorValue rawVal;
 
     if (!Compass.ReadRaw(rawVal)) {
         return;
@@ -114,11 +114,11 @@ void SendDumpData() {
     uint8_t dataStartIndex = 0 + sizeof(BeginBytes);
 
     SplitBytes(OutBuffer, currentIndex, rawVal.X);
-    currentIndex += sizeof(int16_t);
+    currentIndex += sizeof(double);
     SplitBytes(OutBuffer, currentIndex, rawVal.Y);
-    currentIndex += sizeof(int16_t);
+    currentIndex += sizeof(double);
     SplitBytes(OutBuffer, currentIndex, rawVal.Z);
-    currentIndex += sizeof(int16_t);
+    currentIndex += sizeof(double);
 
     for (uint8_t i = dataStartIndex; i < dataLength + dataStartIndex; i++)
         checksum += (uint16_t)OutBuffer[i];
