@@ -4,16 +4,16 @@
 #define _MSCOMPASS_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
+#include "arduino.h"
 #else
-	#include "WProgram.h"
+#include "WProgram.h"
 #endif
 
 #include <Wire.h>
 #define IC_QMC5883L 0
 #define IC_HMC5883L 1
 
-#define IC_TYPE	IC_HMC5883L
+#define IC_TYPE	IC_QMC5883L
 
 #if (IC_TYPE == IC_QMC5883L)
 
@@ -61,7 +61,7 @@
 #define MEASUREMENT_AVERAGE_4		0x02<<5
 #define MEASUREMENT_AVERAGE_8		0x03<<5
 
-//(Control Reg A) Data Output Rate Bits. 
+//(Control Reg A) Data Output Rate Bits.
 //These bits set the rate at which data is written to all three data output registers.
 #define OUTPUT_DATA_RATE_0p75_HZ	0x00<<2
 #define OUTPUT_DATA_RATE_1p5_HZ		0x01<<2
@@ -94,24 +94,58 @@
 
 #endif
 
-struct Vector3 {
-	int16_t X = 0;
-	int16_t Y = 0;
-	int16_t Z = 0;
+struct SensorValue {
+	double X;
+	double Y;
+	double Z;
+	SensorValue operator + (const SensorValue & v) {
+		SensorValue out;
+		out.X = this->X + v.X;
+		out.Y = this->Y + v.Y;
+		out.Z = this->Z + v.Z;
+		return out;
+	}
+	SensorValue operator - (const SensorValue & v) {
+		SensorValue out;
+		out.X = this->X - v.X;
+		out.Y = this->Y - v.Y;
+		out.Z = this->Z - v.Z;
+		return out;
+	}
+	SensorValue operator * (const SensorValue & v) {
+		SensorValue out;
+		out.X = this->X * v.X;
+		out.Y = this->Y * v.Y;
+		out.Z = this->Z * v.Z;
+		return out;
+	}
+	SensorValue operator / (const SensorValue & v) {
+		SensorValue out;
+		out.X = this->X / v.X;
+		out.Y = this->Y / v.Y;
+		out.Z = this->Z / v.Z;
+		return out;
+	}
 };
 
 class MsCompassClass
 {
 protected:
-	boolean write(uint8_t _address, byte _value);
-	boolean read(byte * _buff, uint8_t _address, uint8_t _length);
+	SensorValue scale;
+	SensorValue offset;
+
+	bool write(uint8_t _address, byte _value);
+	bool read(byte * _buff, uint8_t _address, uint8_t _length);
 public:
-	boolean Init();
-	boolean ReadRaw(Vector3 & _raw);
+	bool Init();
+	bool ReadRaw(SensorValue & _raw);
+	bool ReadScaled(SensorValue & _scaled);
+	void SetScale(SensorValue _scale);
+	SensorValue GetScale();
+	void SetOffset(SensorValue _offset);
+	SensorValue GetOffset();
 };
 
 extern MsCompassClass Compass;
 
-
 #endif
-
